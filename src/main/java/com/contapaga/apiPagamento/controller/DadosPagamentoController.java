@@ -1,11 +1,9 @@
 package com.contapaga.apiPagamento.controller;
 
 import com.contapaga.apiPagamento.model.DadosPagamento;
+import com.contapaga.apiPagamento.model.dto.DadosPagementoRequestDTO;
 import com.contapaga.apiPagamento.services.DadosPagamentoService;
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +14,13 @@ import java.util.List;
 @RequestMapping("/pagamento")
 public class DadosPagamentoController {
 
-    @Autowired
-    DadosPagamentoService service;
+    private final DadosPagamentoService service;
+    private final ModelMapper modelMapper;
+
+    public DadosPagamentoController(DadosPagamentoService service, ModelMapper modelMapper) {
+        this.service = service;
+        this.modelMapper = modelMapper;
+    }
 
     @GetMapping
     public ResponseEntity<List<DadosPagamento>> findAll() {
@@ -28,7 +31,9 @@ public class DadosPagamentoController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<DadosPagamento> findById(@PathVariable Long id) {
         DadosPagamento obj = service.findById(id);
-        return ResponseEntity.ok().body(obj);
+        if(obj != null)
+            return ResponseEntity.ok().body(obj);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/dias/{dias}")
@@ -44,7 +49,8 @@ public class DadosPagamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<DadosPagamento> insert(@Valid @RequestBody DadosPagamento entity){
+    public ResponseEntity<DadosPagamento> insert(@Valid @RequestBody DadosPagementoRequestDTO dto){
+        DadosPagamento entity = this.modelMapper.map(dto, DadosPagamento.class);
         DadosPagamento entitySave = service.save(entity);
         return ResponseEntity.ok().body(entitySave);
     }
