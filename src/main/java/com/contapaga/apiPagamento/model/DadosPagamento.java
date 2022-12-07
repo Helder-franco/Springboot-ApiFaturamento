@@ -5,7 +5,6 @@ import com.contapaga.apiPagamento.enums.TipoServicoEnum;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -30,5 +29,5 @@ public class DadosPagamento {
     @NotNull
     private Integer parcelas;
     @CreatedDate
-    private LocalDateTime criado_em;
+    private LocalDateTime criadoEm;
 }

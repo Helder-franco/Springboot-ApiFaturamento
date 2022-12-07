@@ -4,16 +4,19 @@ import com.contapaga.apiPagamento.model.DadosPagamento;
 import com.contapaga.apiPagamento.repository.DadosPagamentoRepository;
 import com.contapaga.apiPagamento.services.DadosPagamentoService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DadosPagamentoServiceImpl implements DadosPagamentoService {
 
-    @Autowired
-    DadosPagamentoRepository repository;
+    private final DadosPagamentoRepository repository;
+
+    public DadosPagamentoServiceImpl(DadosPagamentoRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public DadosPagamento save(DadosPagamento dadosPagamento) {
@@ -31,7 +34,9 @@ public class DadosPagamentoServiceImpl implements DadosPagamentoService {
     }
     @Override
     public DadosPagamento findById(Long id) {
-        return repository.findById(id).get();
+        Optional<DadosPagamento> dadosPagamentoOpt = repository.findById(id);
+        return dadosPagamentoOpt.orElse(null);
+
     }
 
     @Override
@@ -41,7 +46,13 @@ public class DadosPagamentoServiceImpl implements DadosPagamentoService {
 
     @Override
     public void update(DadosPagamento dadosPagamento, Long id) {
-        DadosPagamento dadosPagamentoOld = repository.findById(id).get();
-        BeanUtils.copyProperties(dadosPagamento, dadosPagamentoOld, "id");
+        DadosPagamento dadosPagamentoOld = this.findById(id);
+        if(dadosPagamento != null) {
+            BeanUtils.copyProperties(dadosPagamento, dadosPagamentoOld, "id");
+            this.save(dadosPagamentoOld);
+        } else {
+            throw new RuntimeException("Não foi localizado o registro.");
+        }
+
     }
 }
